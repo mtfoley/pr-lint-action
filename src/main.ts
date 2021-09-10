@@ -21,7 +21,7 @@ async function run(): Promise<void> {
   const files = await listFiles({...pullRequest,pull_number:pullRequest.number});
   const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
   if(filesTripped.length > 0) {
-    core.debug(`Files Tripped: ${filesTripped.join(", ")}`);
+    core.debug(`Files Tripped: ${filesTripped.map(f => f.filename).join(", ")}`);
   }
 }
 async function listFiles(pullRequest: {owner: string, repo: string, pull_number: number}) {
