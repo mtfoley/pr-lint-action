@@ -8,6 +8,7 @@ const githubClient = github.getOctokit(repoTokenInput);
 const titleRegexInput: string = core.getInput("title-regex", {
   required: true,
 });
+const bodyRegexInput: string = core.getInput("body-regex");
 const onFailedRegexCreateReviewInput: boolean =
   core.getInput("on-failed-regex-create-review") == "true";
 const onFailedRegexCommentInput: string = core.getInput(
@@ -29,9 +30,17 @@ async function run(): Promise<void> {
     "%regex%",
     titleRegex.source
   );
-
+  
+  const bodyRegex = new RegExp(bodyRegexInput);
+  const body: string =
+    (githubContext.payload.pull_request?.description as string) ?? "";
+  
   core.debug(`Title Regex: ${titleRegex.source}`);
   core.debug(`Title: ${title}`);
+
+  core.debug(`Body Regex: ${body.source}`);
+  core.debug(`Body: ${body}`);
+  core.debug(`Matches: ${bodyRegex.test(body)}`);
 
   const titleMatchesRegex: boolean = titleRegex.test(title);
   if (!titleMatchesRegex) {
