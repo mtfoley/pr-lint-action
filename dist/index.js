@@ -5804,6 +5804,7 @@ const github = __importStar(__nccwpck_require__(438));
 const repoTokenInput = core.getInput("repo-token", { required: true });
 const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
+const filesToWatch = core.getInput("filenames").split(/\s/).filter(f => f.trim() !== "");
 async function run() {
     var _a, _b;
     const githubContext = github.context;
@@ -5814,8 +5815,9 @@ async function run() {
     core.debug(`Body: ${body}`);
     core.debug(`Matches: ${bodyRegex.test(body)}`);
     const files = await listFiles({ ...pullRequest, pull_number: pullRequest.number });
-    if (files.length > 0) {
-        core.debug(files.map(f => f.filename).join("\n"));
+    const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
+    if (filesTripped.length > 0) {
+        core.debug(`Files Tripped: ${filesTripped.join(", ")}`);
     }
 }
 async function listFiles(pullRequest) {
