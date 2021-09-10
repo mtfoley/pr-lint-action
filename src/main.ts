@@ -38,7 +38,7 @@ async function run(): Promise<void> {
   core.debug(`Title Regex: ${titleRegex.source}`);
   core.debug(`Title: ${title}`);
 
-  core.debug(`Body Regex: ${body.source}`);
+  core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
   core.debug(`Matches: ${bodyRegex.test(body)}`);
 
