@@ -13,6 +13,10 @@ inputs:
     description: "Regex to ensure PR body matches. Allows anything by default."
     required: false
     default: ".*"
+  filenames:
+    description: "List of filenames to check for in PR changes."
+    required: false
+    default: ""
   on-failed-regex-create-review:
     description:
       "Whether the action should create a PR review & comment when the regex
