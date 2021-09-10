@@ -5801,15 +5801,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const github = __importStar(__nccwpck_require__(438));
+const repoTokenInput = core.getInput("repo-token", { required: true });
+const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
 async function run() {
     var _a, _b;
     const githubContext = github.context;
+    const pullRequest = githubContext.issue;
     const bodyRegex = new RegExp(bodyRegexInput, "im");
     const body = (_b = (_a = githubContext.payload.pull_request) === null || _a === void 0 ? void 0 : _a.body) !== null && _b !== void 0 ? _b : "";
     core.debug(`Body Regex: ${bodyRegex.source}`);
     core.debug(`Body: ${body}`);
     core.debug(`Matches: ${bodyRegex.test(body)}`);
+    listFiles({ ...pullRequest, pull_number: pullRequest.number });
+}
+function listFiles(pullRequest) {
+    void githubClient.pulls.listFiles(pullRequest).then(data => core.debug(JSON.stringify(data)));
 }
 run().catch((error) => {
     core.setFailed(error);
