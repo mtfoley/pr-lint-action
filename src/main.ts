@@ -21,40 +21,16 @@ const onFailedRegexRequestChanges: boolean =
 
 async function run(): Promise<void> {
   const githubContext = github.context;
-  const pullRequest = githubContext.issue;
+  const pullRequest = githubContext.issue;  
 
-  const titleRegex = new RegExp(titleRegexInput);
-  const title: string =
-    (githubContext.payload.pull_request?.title as string) ?? "";
-  const comment = onFailedRegexCommentInput.replace(
-    "%regex%",
-    titleRegex.source
-  );
-  
   const bodyRegex = new RegExp(bodyRegexInput);
   const body: string =
     (githubContext.payload.pull_request?.description as string) ?? "";
   
-  core.debug(`Title Regex: ${titleRegex.source}`);
-  core.debug(`Title: ${title}`);
-
   core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
   core.debug(`Matches: ${bodyRegex.test(body)}`);
 
-  const titleMatchesRegex: boolean = titleRegex.test(title);
-  if (!titleMatchesRegex) {
-    if (onFailedRegexCreateReviewInput) {
-      createReview(comment, pullRequest);
-    }
-    if (onFailedRegexFailActionInput) {
-      core.setFailed(comment);
-    }
-  } else {
-    if (onFailedRegexCreateReviewInput) {
-      await dismissReview(pullRequest);
-    }
-  }
 }
 
 function createReview(
