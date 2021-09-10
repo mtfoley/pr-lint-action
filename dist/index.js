@@ -5805,7 +5805,7 @@ const bodyRegexInput = core.getInput("body-regex");
 async function run() {
     var _a, _b;
     const githubContext = github.context;
-    const bodyRegex = new RegExp(bodyRegexInput);
+    const bodyRegex = new RegExp(bodyRegexInput, "im");
     const body = (_b = (_a = githubContext.payload.pull_request) === null || _a === void 0 ? void 0 : _a.body) !== null && _b !== void 0 ? _b : "";
     core.debug(`Body Regex: ${bodyRegex.source}`);
     core.debug(`Body: ${body}`);
