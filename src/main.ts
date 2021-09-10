@@ -9,7 +9,7 @@ async function run(): Promise<void> {
 
   const bodyRegex = new RegExp(bodyRegexInput);
   const body: string =
-    (githubContext.payload.pull_request?.description as string) ?? "";
+    (githubContext.payload.pull_request?.body as string) ?? "";
   
   core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
