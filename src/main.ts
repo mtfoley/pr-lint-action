@@ -19,10 +19,14 @@ async function run(): Promise<void> {
   core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
   core.debug(`Matches: ${bodyRegex.test(body)}`);
-  listFiles({...pullRequest,pull_number:pullRequest.number});
+  const files = await listFiles({...pullRequest,pull_number:pullRequest.number});
+  if(files.length > 0){
+    core.debug(files.map(f => f.filename).join("\n"));
+  }
 }
-function listFiles(pullRequest: {owner: string, repo: string, pull_number: number}) {
-  void githubClient.pulls.listFiles(pullRequest).then(data => core.debug(JSON.stringify(data)));
+async function listFiles(pullRequest: {owner: string, repo: string, pull_number: number}) {
+  const {data: files} = await githubClient.pulls.listFiles(pullRequest);
+  return files;
 }
 run().catch((error) => {
   core.setFailed(error);
