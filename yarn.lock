@@ -45,6 +45,13 @@
     "chalk" "^2.0.0"
     "js-tokens" "^4.0.0"
 
+"@commitlint/config-conventional@^13.1.0":
+  "integrity" "sha512-zukJXqdr6jtMiVRy3tTHmwgKcUMGfqKDEskRigc5W3k2aYF4gBAtCEjMAJGZgSQE4DMcHeok0pEV2ANmTpb0cw=="
+  "resolved" "https://registry.npmjs.org/@commitlint/config-conventional/-/config-conventional-13.1.0.tgz"
+  "version" "13.1.0"
+  dependencies:
+    "conventional-changelog-conventionalcommits" "^4.3.1"
+
 "@commitlint/ensure@^13.1.0":
   "integrity" "sha512-NRGyjOdZQnlYwm9it//BZJ2Vm+4x7G9rEnHpLCvNKYY0c6RA8Qf7hamLAB8dWO12RLuFt06JaOpHZoTt/gHutA=="
   "resolved" "https://registry.npmjs.org/@commitlint/ensure/-/ensure-13.1.0.tgz"
@@ -547,6 +554,15 @@
   "version" "5.0.13"
   dependencies:
     "compare-func" "^2.0.0"
+    "q" "^1.5.1"
+
+"conventional-changelog-conventionalcommits@^4.3.1":
+  "integrity" "sha512-lzWJpPZhbM1R0PIzkwzGBCnAkH5RKJzJfFQZcl/D+2lsJxAwGnDKBqn/F4C1RD31GJNn8NuKWQzAZDAVXPp2Mw=="
+  "resolved" "https://registry.npmjs.org/conventional-changelog-conventionalcommits/-/conventional-changelog-conventionalcommits-4.6.1.tgz"
+  "version" "4.6.1"
+  dependencies:
+    "compare-func" "^2.0.0"
+    "lodash" "^4.17.15"
     "q" "^1.5.1"
 
 "conventional-commits-parser@^3.0.0":
