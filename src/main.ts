@@ -30,7 +30,7 @@ async function run(): Promise<void> {
 }
 async function checkTitle(title:string){
   const lintOpts = await load({extends: [conventionalOpts]});
-  return await lint(title,lintOpts.rules,lintOpts);
+  return await lint(title,lintOpts.rules);
 }
 async function listFiles(pullRequest: {owner: string, repo: string, pull_number: number}) {
   const {data: files} = await githubClient.pulls.listFiles(pullRequest);

@@ -55898,7 +55898,7 @@ async function run() {
 }
 async function checkTitle(title) {
     const lintOpts = await load_1.default({ extends: [conventionalOpts] });
-    return await lint_1.default(title, lintOpts.rules, lintOpts);
+    return await lint_1.default(title, lintOpts.rules);
 }
 async function listFiles(pullRequest) {
     const { data: files } = await githubClient.pulls.listFiles(pullRequest);
