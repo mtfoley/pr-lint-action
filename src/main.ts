@@ -1,6 +1,5 @@
 //import { OctokitResponse, PullsListReviewsResponseData } from "@octokit/types";
 import lint from '@commitlint/lint';
-import load from '@commitlint/load';
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as conventionalOpts from '@commitlint/config-conventional';
@@ -29,8 +28,7 @@ async function run(): Promise<void> {
   makeComment(githubContext,pullRequest.number,titleValid,lintErrors,bodyRegex.test(body),filesTripped);
 }
 async function checkTitle(title:string){
-  const lintOpts = await load({extends: [conventionalOpts]});
-  return await lint(title,lintOpts.rules);
+  return await lint(title,conventionalOpts.rules,conventionalOpts);
 }
 async function listFiles(pullRequest: {owner: string, repo: string, pull_number: number}) {
   const {data: files} = await githubClient.pulls.listFiles(pullRequest);
