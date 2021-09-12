@@ -8,23 +8,23 @@ inputs:
   message-title-valid:
     description: "Message if the PR title is valid"
     required: false
-    default: "- [x] PR title should be valid conventional commit"
+    default: ""
   message-title-invalid:
-    description: "Message if the PR title is valid"
+    description: "Message if the PR title is invalid"
     required: false
-    default: "- [ ] PR title should be valid conventional commit"
+    default: "- PR title should be valid conventional commit"
   message-issue-valid:
     description: "Message if the PR is linked to an issue according to body-regex"
     required: false
-    default: "- [x] PR body should designate linked issue"
+    default: ""
   message-issue-invalid:
     description: "Message if the PR is linked to an issue according to body-regex"
     required: false
-    default: "- [ ] PR body should designate linked issue"
+    default: "- PR body should designate linked issue"
   message-files-matched:
     description: "Message if the PR modifies files specified in filenames input"
     required: false
-    default: "- Note to Maintainers: This PR *does* modify watched files"
+    default: "- Note to Maintainers: This PR modifies key files"
   message-files-not-matched:
     description: "Message if the PR does not modify files specified in filenames input"
     required: false
