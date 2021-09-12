@@ -1,4 +1,5 @@
 //import { OctokitResponse, PullsListReviewsResponseData } from "@octokit/types";
+import lint from '@commitlint/lint';
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
@@ -13,11 +14,14 @@ async function run(): Promise<void> {
   const bodyRegex = new RegExp(bodyRegexInput,"im");
   const body: string =
     (githubContext.payload.pull_request?.body as string) ?? "";
-  
-
+  const title: string =
+    (githubContext.payload.pull_request?.title as string) ?? "";
+  let valid = false;
+  lint(title).then(report => valid = report.valid);
   core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
   core.debug(`Matches: ${bodyRegex.test(body)}`);
+  core.debug(`Lint Valid: ${valid}`)
   const files = await listFiles({...pullRequest,pull_number:pullRequest.number});
   const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
   if(filesTripped.length > 0) {
