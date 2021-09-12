@@ -38437,17 +38437,17 @@ async function listFiles(pullRequest) {
     return files;
 }
 async function makeComment(context, number, titleValid, lintErrors, linkedIssue, filesMatched) {
-    let message = "### Pull Request Linter\n";
+    let message = "";
     const lintErrorsMessage = lintErrors.map(e => e.message).join("\n");
     message += (titleValid ? messageTitleValid : messageTitleInvalid) + "\n";
-    message += (linkedIssue ? messageIssueValid : (messageIssueInvalid + "Lint Errors:" + lintErrorsMessage)) + "\n";
+    message += (linkedIssue ? messageIssueValid : (messageIssueInvalid + "\nLint Errors:" + lintErrorsMessage)) + "\n";
     message += (filesMatched ? messageFilesMatched : messageFilesNotMatched) + "\n";
     if (message.trim() == "")
         return;
     await githubClient.issues.createComment({
         ...context.repo,
         issue_number: number,
-        body: message
+        body: "### Pull Request Linter\n" + message
     });
 }
 run().catch((error) => {

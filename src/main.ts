@@ -35,17 +35,17 @@ async function listFiles(pullRequest: {owner: string, repo: string, pull_number:
   return files;
 }
 async function makeComment(context: any, number:number, titleValid: boolean, lintErrors: any[], linkedIssue: boolean, filesMatched: boolean) {
-  let message = "### Pull Request Linter\n";
+  let message = "";
   const lintErrorsMessage: string = lintErrors.map(e=>e.message).join("\n");
   message += (titleValid ? messageTitleValid : messageTitleInvalid) + "\n";
-  message += (linkedIssue ? messageIssueValid : (messageIssueInvalid + "Lint Errors:" + lintErrorsMessage)) + "\n";
+  message += (linkedIssue ? messageIssueValid : (messageIssueInvalid + "\nLint Errors:" + lintErrorsMessage)) + "\n";
   message += (filesMatched ? messageFilesMatched : messageFilesNotMatched) + "\n";
   // short circuit if nothing to say.
   if(message.trim() == "") return;
   await githubClient.issues.createComment({
     ...context.repo,
     issue_number: number,
-    body: message
+    body: "### Pull Request Linter\n"+message
   });
 }
 run().catch((error) => {

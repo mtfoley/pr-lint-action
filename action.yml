@@ -1,6 +1,6 @@
 name: "Pull Request Linter"
-description: "Ensure your PR titles match a given regex."
-author: "MorrisonCole"
+description: "Ensure your PR matches certain criteria."
+author: "MorrisonCole - fork by mtfoley"
 branding:
   icon: "check"
   color: "green"
