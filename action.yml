@@ -5,8 +5,6 @@ branding:
   icon: "check"
   color: "green"
 inputs:
-const messageFilesMatched: string = core.getInput("message-files-matched");
-const messageFilesNotMatched: string = core.getInput("message-files-not-matched");
   message-title-valid:
     description: "Message if the PR title is valid"
     required: false
