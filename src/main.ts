@@ -3,7 +3,7 @@ import lint from '@commitlint/lint';
 import load from '@commitlint/load';
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-
+import '@commitlint/config-conventional';
 const repoTokenInput = core.getInput("repo-token", { required: true });
 const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput: string = core.getInput("body-regex");

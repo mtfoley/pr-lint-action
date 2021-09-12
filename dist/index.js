@@ -55731,6 +55731,7 @@ const lint_1 = __importDefault(__nccwpck_require__(9152));
 const load_1 = __importDefault(__nccwpck_require__(6791));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+__nccwpck_require__(213);
 const repoTokenInput = core.getInput("repo-token", { required: true });
 const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
@@ -55778,6 +55779,14 @@ async function makeComment(context, number, titleValid, lintErrors, linkedIssue,
 run().catch((error) => {
     core.setFailed(error);
 });
+
+
+/***/ }),
+
+/***/ 213:
+/***/ ((module) => {
+
+module.exports = eval("require")("@commitlint/config-conventional");
 
 
 /***/ }),
