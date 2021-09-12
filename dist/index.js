@@ -38268,6 +38268,12 @@ const repoTokenInput = core.getInput("repo-token", { required: true });
 const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
 const filesToWatch = core.getInput("filenames").split(/\s/).filter(f => f.trim() !== "");
+const messageTitleValid = core.getInput("message-title-valid");
+const messageTitleInvalid = core.getInput("message-title-invalid");
+const messageIssueValid = core.getInput("message-issue-valid");
+const messageIssueInvalid = core.getInput("message-issue-invalid");
+const messageFilesMatched = core.getInput("message-files-matched");
+const messageFilesNotMatched = core.getInput("message-files-not-matched");
 async function run() {
     var _a, _b, _c, _d;
     const githubContext = github.context;
@@ -38276,20 +38282,26 @@ async function run() {
     const body = (_b = (_a = githubContext.payload.pull_request) === null || _a === void 0 ? void 0 : _a.body) !== null && _b !== void 0 ? _b : "";
     const title = (_d = (_c = githubContext.payload.pull_request) === null || _c === void 0 ? void 0 : _c.title) !== null && _d !== void 0 ? _d : "";
     const titleValid = await lint_1.default(title).then(report => report.valid);
-    core.debug(`Title: ${title}`);
-    core.debug(`Title Valid: ${titleValid}`);
-    core.debug(`Body Regex: ${bodyRegex.source}`);
-    core.debug(`Body: ${body}`);
-    core.debug(`Matches: ${bodyRegex.test(body)}`);
     const files = await listFiles({ ...pullRequest, pull_number: pullRequest.number });
-    const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
-    if (filesTripped.length > 0) {
-        core.debug(`Files Tripped: ${filesTripped.map(f => f.filename).join(", ")}`);
-    }
+    const filesTripped = files.filter(f => filesToWatch.includes(f.filename)).length > 0;
+    makeComment(githubContext, pullRequest.number, titleValid, bodyRegex.test(body), filesTripped);
 }
 async function listFiles(pullRequest) {
     const { data: files } = await githubClient.pulls.listFiles(pullRequest);
     return files;
+}
+async function makeComment(context, number, titleValid, linkedIssue, filesMatched) {
+    let message = "### Pull Request Linter\n";
+    message += (titleValid ? messageTitleValid : messageTitleInvalid) + "\n";
+    message += (linkedIssue ? messageIssueValid : messageIssueInvalid) + "\n";
+    message += (filesMatched ? messageFilesMatched : messageFilesNotMatched) + "\n";
+    if (message.trim() == "")
+        return;
+    await githubClient.issues.createComment({
+        ...context.repo,
+        issue_number: number,
+        body: message
+    });
 }
 run().catch((error) => {
     core.setFailed(error);

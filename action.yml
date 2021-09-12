@@ -5,39 +5,40 @@ branding:
   icon: "check"
   color: "green"
 inputs:
-  title-regex:
-    description: "Regex to ensure PR title matches. Allows anything by default."
-    required: true
-    default: ".*"
+const messageFilesMatched: string = core.getInput("message-files-matched");
+const messageFilesNotMatched: string = core.getInput("message-files-not-matched");
+  message-title-valid:
+    description: "Message if the PR title is valid"
+    required: false
+    default: "- [x] PR title should be valid conventional commit"
+  message-title-invalid:
+    description: "Message if the PR title is valid"
+    required: false
+    default: "- [ ] PR title should be valid conventional commit"
+  message-issue-valid:
+    description: "Message if the PR is linked to an issue according to body-regex"
+    required: false
+    default: "- [x] PR body should designate linked issue"
+  message-issue-invalid:
+    description: "Message if the PR is linked to an issue according to body-regex"
+    required: false
+    default: "- [ ] PR body should designate linked issue"
+  message-files-matched:
+    description: "Message if the PR modifies files specified in filenames input"
+    required: false
+    default: "- Note to Maintainers: This PR *does* modify watched files"
+  message-files-not-matched:
+    description: "Message if the PR does not modify files specified in filenames input"
+    required: false
+    default: ""
   body-regex:
     description: "Regex to ensure PR body matches. Allows anything by default."
-    required: false
+    required: true
     default: ".*"
   filenames:
     description: "List of filenames to check for in PR changes."
     required: false
     default: ""
-  on-failed-regex-create-review:
-    description:
-      "Whether the action should create a PR review & comment when the regex
-      doesn't match."
-    required: false
-    default: true
-  on-failed-regex-comment:
-    description:
-      "Comment for the bot to post on PRs that fail the regex. Use %regex% to
-      reference regex."
-    required: false
-    default: "PR title failed to match %regex%."
-  on-failed-regex-fail-action:
-    description: "Whether the action should fail when the regex doesn't match."
-    required: false
-    default: false
-  on-failed-regex-request-changes:
-    description:
-      "Whether the action should request changes or just provide a comment."
-    required: false
-    default: true
   repo-token:
     description:
       "Github token with access to the repository (secrets.GITHUB_TOKEN)."
