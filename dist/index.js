@@ -38275,13 +38275,12 @@ async function run() {
     const bodyRegex = new RegExp(bodyRegexInput, "im");
     const body = (_b = (_a = githubContext.payload.pull_request) === null || _a === void 0 ? void 0 : _a.body) !== null && _b !== void 0 ? _b : "";
     const title = (_d = (_c = githubContext.payload.pull_request) === null || _c === void 0 ? void 0 : _c.title) !== null && _d !== void 0 ? _d : "";
+    const titleValid = await lint_1.default(title).then(report => report.valid);
     core.debug(`Title: ${title}`);
+    core.debug(`Title Valid: ${titleValid}`);
     core.debug(`Body Regex: ${bodyRegex.source}`);
     core.debug(`Body: ${body}`);
     core.debug(`Matches: ${bodyRegex.test(body)}`);
-    lint_1.default(title).then(report => {
-        core.debug(`Lint Valid: ${JSON.stringify(report)}`);
-    });
     const files = await listFiles({ ...pullRequest, pull_number: pullRequest.number });
     const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
     if (filesTripped.length > 0) {

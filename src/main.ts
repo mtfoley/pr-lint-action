@@ -16,13 +16,12 @@ async function run(): Promise<void> {
     (githubContext.payload.pull_request?.body as string) ?? "";
   const title: string =
     (githubContext.payload.pull_request?.title as string) ?? "";
+  const titleValid = await lint(title).then(report => report.valid);
   core.debug(`Title: ${title}`);
+  core.debug(`Title Valid: ${titleValid}`);
   core.debug(`Body Regex: ${bodyRegex.source}`);
   core.debug(`Body: ${body}`);
   core.debug(`Matches: ${bodyRegex.test(body)}`);
-  lint(title).then(report => {
-    core.debug(`Lint Valid: ${JSON.stringify(report)}`);
-  });
   const files = await listFiles({...pullRequest,pull_number:pullRequest.number});
   const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
   if(filesTripped.length > 0) {
