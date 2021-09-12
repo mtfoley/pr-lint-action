@@ -38269,21 +38269,19 @@ const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
 const filesToWatch = core.getInput("filenames").split(/\s/).filter(f => f.trim() !== "");
 async function run() {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d;
     const githubContext = github.context;
     const pullRequest = githubContext.issue;
     const bodyRegex = new RegExp(bodyRegexInput, "im");
     const body = (_b = (_a = githubContext.payload.pull_request) === null || _a === void 0 ? void 0 : _a.body) !== null && _b !== void 0 ? _b : "";
     const title = (_d = (_c = githubContext.payload.pull_request) === null || _c === void 0 ? void 0 : _c.title) !== null && _d !== void 0 ? _d : "";
-    const links = (_f = (_e = githubContext.payload.pull_request) === null || _e === void 0 ? void 0 : _e._links) !== null && _f !== void 0 ? _f : {};
-    let report = {};
-    lint_1.default(title).then(_report => report = _report);
     core.debug(`Title: ${title}`);
     core.debug(`Body Regex: ${bodyRegex.source}`);
     core.debug(`Body: ${body}`);
     core.debug(`Matches: ${bodyRegex.test(body)}`);
-    core.debug(`Lint Valid: ${JSON.stringify(report)}`);
-    core.debug(`Issue URL: ${JSON.stringify(links)}`);
+    lint_1.default(title).then(report => {
+        core.debug(`Lint Valid: ${JSON.stringify(report)}`);
+    });
     const files = await listFiles({ ...pullRequest, pull_number: pullRequest.number });
     const filesTripped = files.filter(f => filesToWatch.includes(f.filename));
     if (filesTripped.length > 0) {
