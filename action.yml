@@ -29,6 +29,18 @@ inputs:
     description: "Message if the PR does not modify files specified in filenames input"
     required: false
     default: ""
+  message-valid-branch:
+    description: "Message if the PR is not being sent from a protected branch"
+    required: false
+    default: ""
+  message-invalid-branch:
+    description: "Message if the PR is being sent from a protected branch"
+    required: false
+    default: "- PR is being sent from an invalid branch \"%branch\".%"
+  protect-branch:
+    description: "Set to branch name that PRs should not be sent from (e.g. main)"
+    required: false
+    default: ""
   body-regex:
     description: "Regex to ensure PR body matches. Allows anything by default."
     required: true
