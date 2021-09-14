@@ -36,7 +36,7 @@ inputs:
   message-invalid-branch:
     description: "Message if the PR is being sent from a protected branch"
     required: false
-    default: "- PR is being sent from an invalid branch \"%branch\".%"
+    default: "- PR is being sent from an invalid branch \"%branch%\""
   protect-branch:
     description: "Set to branch name that PRs should not be sent from (e.g. main)"
     required: false
