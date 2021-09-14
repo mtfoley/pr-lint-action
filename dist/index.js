@@ -9528,14 +9528,15 @@ module.exports = kebabCase;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.20';
+  var VERSION = '4.17.21';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
 
   /** Error message constants. */
   var CORE_ERROR_TEXT = 'Unsupported core-js use. Try https://npms.io/search?q=ponyfill.',
-      FUNC_ERROR_TEXT = 'Expected a function';
+      FUNC_ERROR_TEXT = 'Expected a function',
+      INVALID_TEMPL_VAR_ERROR_TEXT = 'Invalid `variable` option passed into `_.template`';
 
   /** Used to stand-in for `undefined` hash values. */
   var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -9668,10 +9669,11 @@ module.exports = kebabCase;
   var reRegExpChar = /[\\^$.*+?()[\]{}|]/g,
       reHasRegExpChar = RegExp(reRegExpChar.source);
 
-  /** Used to match leading and trailing whitespace. */
-  var reTrim = /^\s+|\s+$/g,
-      reTrimStart = /^\s+/,
-      reTrimEnd = /\s+$/;
+  /** Used to match leading whitespace. */
+  var reTrimStart = /^\s+/;
+
+  /** Used to match a single whitespace character. */
+  var reWhitespace = /\s/;
 
   /** Used to match wrap detail comments. */
   var reWrapComment = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/,
@@ -9680,6 +9682,18 @@ module.exports = kebabCase;
 
   /** Used to match words composed of alphanumeric characters. */
   var reAsciiWord = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
+
+  /**
+   * Used to validate the `validate` option in `_.template` variable.
+   *
+   * Forbids characters which could potentially change the meaning of the function argument definition:
+   * - "()," (modification of function parameters)
+   * - "=" (default value)
+   * - "[]{}" (destructuring of function parameters)
+   * - "/" (beginning of a comment)
+   * - whitespace
+   */
+  var reForbiddenIdentifierChars = /[()=,{}\[\]\/\s]/;
 
   /** Used to match backslashes in property paths. */
   var reEscapeChar = /\\(\\)?/g;
@@ -10510,6 +10524,19 @@ module.exports = kebabCase;
   }
 
   /**
+   * The base implementation of `_.trim`.
+   *
+   * @private
+   * @param {string} string The string to trim.
+   * @returns {string} Returns the trimmed string.
+   */
+  function baseTrim(string) {
+    return string
+      ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '')
+      : string;
+  }
+
+  /**
    * The base implementation of `_.unary` without support for storing metadata.
    *
    * @private
@@ -10840,6 +10867,21 @@ module.exports = kebabCase;
     return hasUnicode(string)
       ? unicodeToArray(string)
       : asciiToArray(string);
+  }
+
+  /**
+   * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
+   * character of `string`.
+   *
+   * @private
+   * @param {string} string The string to inspect.
+   * @returns {number} Returns the index of the last non-whitespace character.
+   */
+  function trimmedEndIndex(string) {
+    var index = string.length;
+
+    while (index-- && reWhitespace.test(string.charAt(index))) {}
+    return index;
   }
 
   /**
@@ -22010,7 +22052,7 @@ module.exports = kebabCase;
       if (typeof value != 'string') {
         return value === 0 ? value : +value;
       }
-      value = value.replace(reTrim, '');
+      value = baseTrim(value);
       var isBinary = reIsBinary.test(value);
       return (isBinary || reIsOctal.test(value))
         ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
@@ -24382,6 +24424,12 @@ module.exports = kebabCase;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
+      // Throw an error if a forbidden character was found in `variable`, to prevent
+      // potential command injection attacks.
+      else if (reForbiddenIdentifierChars.test(variable)) {
+        throw new Error(INVALID_TEMPL_VAR_ERROR_TEXT);
+      }
+
       // Cleanup code by stripping empty strings.
       source = (isEvaluating ? source.replace(reEmptyStringLeading, '') : source)
         .replace(reEmptyStringMiddle, '$1')
@@ -24495,7 +24543,7 @@ module.exports = kebabCase;
     function trim(string, chars, guard) {
       string = toString(string);
       if (string && (guard || chars === undefined)) {
-        return string.replace(reTrim, '');
+        return baseTrim(string);
       }
       if (!string || !(chars = baseToString(chars))) {
         return string;
@@ -24530,7 +24578,7 @@ module.exports = kebabCase;
     function trimEnd(string, chars, guard) {
       string = toString(string);
       if (string && (guard || chars === undefined)) {
-        return string.replace(reTrimEnd, '');
+        return string.slice(0, trimmedEndIndex(string) + 1);
       }
       if (!string || !(chars = baseToString(chars))) {
         return string;
@@ -38411,14 +38459,17 @@ const repoTokenInput = core.getInput("repo-token", { required: true });
 const githubClient = github.getOctokit(repoTokenInput);
 const bodyRegexInput = core.getInput("body-regex");
 const filesToWatch = core.getInput("filenames").split(/\s/).filter(f => f.trim() !== "");
+const protectBranch = core.getInput("protect-branch");
 const messageTitleValid = core.getInput("message-title-valid");
 const messageTitleInvalid = core.getInput("message-title-invalid");
 const messageIssueValid = core.getInput("message-issue-valid");
 const messageIssueInvalid = core.getInput("message-issue-invalid");
 const messageFilesMatched = core.getInput("message-files-matched");
 const messageFilesNotMatched = core.getInput("message-files-not-matched");
+const messageValidBranch = core.getInput("message-valid-branch");
+const messageInvalidBranch = core.getInput("message-invalid-branch");
 async function run() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g;
     const githubContext = github.context;
     const pullRequest = githubContext.issue;
     const bodyRegex = new RegExp(bodyRegexInput, "im");
@@ -38427,7 +38478,9 @@ async function run() {
     const { valid: titleValid, errors: lintErrors } = await checkTitle(title);
     const files = await listFiles({ ...pullRequest, pull_number: pullRequest.number });
     const filesTripped = files.filter(f => filesToWatch.includes(f.filename)).length > 0;
-    makeComment(githubContext, pullRequest.number, titleValid, lintErrors, bodyRegex.test(body), filesTripped);
+    const headRef = (_g = (_f = (_e = githubContext.payload.pull_request) === null || _e === void 0 ? void 0 : _e.head) === null || _f === void 0 ? void 0 : _f.ref) !== null && _g !== void 0 ? _g : "";
+    let invalidBranch = (protectBranch !== "" && headRef == protectBranch);
+    makeComment(githubContext, pullRequest.number, titleValid, lintErrors, bodyRegex.test(body), filesTripped, invalidBranch, headRef);
 }
 async function checkTitle(title) {
     return await lint_1.default(title, conventionalOpts.rules, conventionalOpts);
@@ -38436,12 +38489,13 @@ async function listFiles(pullRequest) {
     const { data: files } = await githubClient.pulls.listFiles(pullRequest);
     return files;
 }
-async function makeComment(context, number, titleValid, lintErrors, linkedIssue, filesMatched) {
+async function makeComment(context, number, titleValid, lintErrors, linkedIssue, filesMatched, invalidBranch, branch) {
     let message = "";
     const lintErrorsMessage = lintErrors.map(e => e.message).join("\n");
     message += (titleValid ? messageTitleValid : messageTitleInvalid) + "\n";
     message += (linkedIssue ? messageIssueValid : (messageIssueInvalid + "\nLint Errors:" + lintErrorsMessage)) + "\n";
     message += (filesMatched ? messageFilesMatched : messageFilesNotMatched) + "\n";
+    message += (invalidBranch ? messageInvalidBranch.replace("%branch%", branch) : messageValidBranch) + "\n";
     if (message.trim() == "")
         return;
     await githubClient.issues.createComment({
